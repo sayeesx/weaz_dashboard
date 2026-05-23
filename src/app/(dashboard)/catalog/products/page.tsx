@@ -31,16 +31,27 @@ export interface Product {
 
 // ─── Upload helper ─────────────────────────────────────────────────────────────
 async function uploadToCloudinary(file: File, folder = 'weaz/products'): Promise<string> {
-  const res  = await fetch('/api/cloudinary/sign', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
+  const res = await fetch('/api/cloudinary/sign', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ folder }),
   });
+  if (!res.ok) throw new Error('Failed to get upload signature');
   const { signature, timestamp, api_key } = await res.json();
+
   const fd = new FormData();
-  fd.append('file', file); fd.append('api_key', api_key);
-  fd.append('timestamp', String(timestamp)); fd.append('signature', signature);
+  // Only append params that were included in the signature — order doesn't matter for FormData
+  // but the set of params must exactly match what was signed server-side
+  fd.append('file', file);
+  fd.append('api_key', api_key);
+  fd.append('timestamp', String(timestamp));
+  fd.append('signature', signature);
   fd.append('folder', folder);
-  const up = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, { method: 'POST', body: fd });
+
+  const up = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+    method: 'POST',
+    body: fd,
+  });
   const data = await up.json();
   if (!data.secure_url) throw new Error(data.error?.message || 'Upload failed');
   return data.secure_url;
@@ -110,7 +121,7 @@ const F = ({ label, children, required }: { label: string; children: React.React
 const Input = (props: React.InputHTMLAttributes<HTMLInputElement> & { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) => (
   <input
     {...props}
-    className="h-9 rounded-lg border border-border/50 bg-card/80 px-3 text-[12px] text-white outline-none focus:border-white/30 placeholder:text-muted-foreground/50"
+    className="h-10 w-full rounded-lg border border-border/50 bg-card/80 px-3 text-[12px] text-white outline-none focus:border-white/30 placeholder:text-muted-foreground/50"
   />
 );
 
@@ -240,11 +251,21 @@ export function ProductDrawer({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center sm:p-6">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative flex h-full w-full sm:h-auto sm:max-h-full sm:max-w-[900px] flex-col sm:rounded-xl border-0 sm:border border-border/50 bg-background shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+
+      {/* Sheet — slides up from bottom on mobile, centered modal on sm+ */}
+      <div className="relative flex w-full flex-col sm:max-w-[900px] sm:rounded-xl border-0 sm:border border-border/50 bg-background shadow-2xl overflow-hidden
+                      h-[92dvh] sm:h-auto sm:max-h-[90dvh] rounded-t-2xl sm:rounded-xl">
+
+        {/* Drag handle (mobile only) */}
+        <div className="flex justify-center pt-3 pb-1 sm:hidden">
+          <div className="h-1 w-10 rounded-full bg-white/20" />
+        </div>
+
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border/50 px-4 sm:px-6 py-3 sm:py-4 bg-muted/30">
+        <div className="flex items-center justify-between border-b border-border/50 px-4 sm:px-6 py-3 bg-muted/30 shrink-0">
           <h2 className="text-[14px] font-bold text-white">
             {product ? 'Edit Product' : 'Create Product'}
           </h2>
@@ -253,30 +274,35 @@ export function ProductDrawer({
           </button>
         </div>
 
-        {/* Form */}
-        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-5 space-y-6">
-          {/* Images */}
-          <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-4">
+        {/* Scrollable form body */}
+        <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 py-4 space-y-5">
+
+          {/* Images — stacked on mobile, side-by-side on sm+ */}
+          <div className="grid grid-cols-2 sm:grid-cols-[140px_1fr] gap-3">
             <F label="Main Image">
               <ImageDropZone value={form.cloudinary_image_url} onChange={v => set('cloudinary_image_url', v)} />
             </F>
             <F label="Gallery">
               <div className="flex flex-wrap gap-2">
                 {form.gallery_urls.map(url => (
-                  <div key={url} className="group relative h-16 w-16 overflow-hidden rounded-lg">
+                  <div key={url} className="group relative h-14 w-14 sm:h-16 sm:w-16 overflow-hidden rounded-lg">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={url} alt="" className="h-full w-full object-cover" />
-                    <button onClick={() => removeGallery(url)}
-                      className="absolute right-0.5 top-0.5 hidden rounded bg-black/80 p-0.5 group-hover:flex">
+                    <button
+                      onClick={() => removeGallery(url)}
+                      className="absolute right-0.5 top-0.5 flex rounded bg-black/80 p-0.5"
+                    >
                       <X className="h-2.5 w-2.5 text-white" />
                     </button>
                   </div>
                 ))}
                 <button
                   onClick={() => galleryRef.current?.click()}
-                  className="flex h-16 w-16 flex-col items-center justify-center rounded-lg border border-dashed border-border/50 hover:border-white/20 transition-colors"
+                  className="flex h-14 w-14 sm:h-16 sm:w-16 flex-col items-center justify-center rounded-lg border border-dashed border-border/50 hover:border-white/20 transition-colors"
                 >
-                  {galleryLoading ? <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /> : <Plus className="h-4 w-4 text-muted-foreground" />}
+                  {galleryLoading
+                    ? <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    : <Plus className="h-4 w-4 text-muted-foreground" />}
                 </button>
                 <input ref={galleryRef} type="file" multiple accept="image/*" className="hidden"
                   onChange={e => addGallery(e.target.files)} />
@@ -284,27 +310,35 @@ export function ProductDrawer({
             </F>
           </div>
 
-          {/* Core fields */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <F label="Product Name" required><Input value={form.title as string} onChange={e => set('title', e.target.value)} placeholder="e.g. Paracetamol 500mg" /></F>
-            <F label="Slug"><Input value={form.slug as string} onChange={e => set('slug', e.target.value)} placeholder="auto-generated" /></F>
+          {/* Name + Slug */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <F label="Product Name" required>
+              <Input value={form.title as string} onChange={e => set('title', e.target.value)} placeholder="e.g. Paracetamol 500mg" />
+            </F>
+            <F label="Slug">
+              <Input value={form.slug as string} onChange={e => set('slug', e.target.value)} placeholder="auto-generated" />
+            </F>
           </div>
-          <F label="Subtitle"><Input value={form.subtitle as string} onChange={e => set('subtitle', e.target.value)} placeholder="Short descriptor" /></F>
+
+          <F label="Subtitle">
+            <Input value={form.subtitle as string} onChange={e => set('subtitle', e.target.value)} placeholder="Short descriptor" />
+          </F>
+
           <F label="Description">
             <textarea
               rows={3}
-              value={form.description}
+              value={form.description ?? ''}
               onChange={e => set('description', e.target.value)}
               placeholder="Detailed product description…"
-              className="rounded-lg border border-border/50 bg-card/80 px-3 py-2 text-[12px] text-white outline-none resize-none focus:border-white/30 placeholder:text-muted-foreground/50"
+              className="w-full rounded-lg border border-border/50 bg-card/80 px-3 py-2 text-[12px] text-white outline-none resize-none focus:border-white/30 placeholder:text-muted-foreground/50"
             />
           </F>
 
           {/* Category / Brand */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <F label="Category">
               <select value={form.category_id} onChange={e => set('category_id', e.target.value)}
-                className="h-9 rounded-lg border border-border/50 bg-card/80 px-3 text-[12px] text-white outline-none">
+                className="h-10 w-full rounded-lg border border-border/50 bg-card/80 px-3 text-[12px] text-white outline-none">
                 <option value="">— Select category —</option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
               </select>
@@ -312,44 +346,63 @@ export function ProductDrawer({
             <F label="Brand">
               <div className="flex gap-2">
                 <select value={form.brand_id} onChange={e => set('brand_id', e.target.value)}
-                  className="h-9 flex-1 rounded-lg border border-border/50 bg-card/80 px-3 text-[12px] text-white outline-none">
+                  className="h-10 flex-1 rounded-lg border border-border/50 bg-card/80 px-3 text-[12px] text-white outline-none">
                   <option value="">— Select brand —</option>
                   {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                 </select>
-                <button type="button" onClick={createBrand} className="h-9 rounded-lg bg-white/10 px-3 text-[11px] text-white hover:bg-white/15 whitespace-nowrap">
-                  <Plus className="h-3.5 w-3.5 inline mr-1" /> New
+                <button type="button" onClick={createBrand}
+                  className="h-10 rounded-lg bg-white/10 px-3 text-[11px] text-white hover:bg-white/15 whitespace-nowrap">
+                  <Plus className="h-3.5 w-3.5 inline mr-1" />New
                 </button>
               </div>
             </F>
           </div>
 
-          {/* Pricing */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <F label="Price (₹)" required><Input value={form.price as string} onChange={e => set('price', e.target.value)} type="number" placeholder="0.00" /></F>
-            <F label="MRP (₹)"><Input value={form.mrp as string} onChange={e => set('mrp', e.target.value)} type="number" placeholder="0.00" /></F>
-            <F label="Discount (%)"><Input value={form.discount as string} onChange={e => set('discount', e.target.value)} type="number" placeholder="0" /></F>
+          {/* Pricing — 2 cols on mobile, 3 on sm+ */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <F label="Price (₹)" required>
+              <Input value={form.price as string} onChange={e => set('price', e.target.value)} type="number" placeholder="0.00" />
+            </F>
+            <F label="MRP (₹)">
+              <Input value={form.mrp as string} onChange={e => set('mrp', e.target.value)} type="number" placeholder="0.00" />
+            </F>
+            <F label="Discount (%)" >
+              <Input value={form.discount as string} onChange={e => set('discount', e.target.value)} type="number" placeholder="0" />
+            </F>
           </div>
 
-          {/* Stock & Unit */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <F label="Stock"><Input value={form.stock as string} onChange={e => set('stock', e.target.value)} type="number" placeholder="0" /></F>
-            <F label="Unit"><Input value={form.unit as string} onChange={e => set('unit', e.target.value)} placeholder="e.g. 10 Tablets" /></F>
-            <F label="Weight (g)"><Input value={form.weight as string} onChange={e => set('weight', e.target.value)} type="number" placeholder="0" /></F>
+          {/* Stock / Unit / Weight */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <F label="Stock">
+              <Input value={form.stock as string} onChange={e => set('stock', e.target.value)} type="number" placeholder="0" />
+            </F>
+            <F label="Unit">
+              <Input value={form.unit as string} onChange={e => set('unit', e.target.value)} placeholder="e.g. 10 Tablets" />
+            </F>
+            <F label="Weight (g)">
+              <Input value={form.weight as string} onChange={e => set('weight', e.target.value)} type="number" placeholder="0" />
+            </F>
           </div>
 
           {/* SKU / Barcode */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <F label="SKU"><Input value={form.sku as string} onChange={e => set('sku', e.target.value)} placeholder="WEAZ-001" /></F>
-            <F label="Barcode"><Input value={form.barcode as string} onChange={e => set('barcode', e.target.value)} placeholder="EAN / UPC" /></F>
+          <div className="grid grid-cols-2 gap-3">
+            <F label="SKU">
+              <Input value={form.sku as string} onChange={e => set('sku', e.target.value)} placeholder="WEAZ-001" />
+            </F>
+            <F label="Barcode">
+              <Input value={form.barcode as string} onChange={e => set('barcode', e.target.value)} placeholder="EAN / UPC" />
+            </F>
           </div>
 
           {/* Tags */}
           <F label="Tags">
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1.5 mb-1.5">
               {form.tags.map(t => (
                 <span key={t} className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white">
                   {t}
-                  <button onClick={() => set('tags', form.tags.filter(x => x !== t))}><X className="h-2.5 w-2.5" /></button>
+                  <button onClick={() => set('tags', form.tags.filter(x => x !== t))}>
+                    <X className="h-2.5 w-2.5" />
+                  </button>
                 </span>
               ))}
             </div>
@@ -357,32 +410,42 @@ export function ProductDrawer({
               <input
                 value={form.tagInput}
                 onChange={e => set('tagInput', e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTag(); }}}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTag(); } }}
                 placeholder="Add tag, press Enter"
-                className="h-8 flex-1 rounded-lg border border-border/50 bg-card/80 px-3 text-[12px] text-white outline-none focus:border-white/30 placeholder:text-muted-foreground/50"
+                className="h-10 flex-1 rounded-lg border border-border/50 bg-card/80 px-3 text-[12px] text-white outline-none focus:border-white/30 placeholder:text-muted-foreground/50"
               />
-              <button onClick={addTag} className="h-8 rounded-lg bg-white/10 px-3 text-[11px] text-white hover:bg-white/15"><Tag className="h-3 w-3" /></button>
+              <button onClick={addTag} className="h-10 rounded-lg bg-white/10 px-3 text-[11px] text-white hover:bg-white/15">
+                <Tag className="h-3 w-3" />
+              </button>
             </div>
           </F>
 
-          {/* Feature flags */}
+          {/* Flags */}
           <F label="Flags">
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
               <Toggle value={form.visibility} onChange={() => set('visibility', !form.visibility)} label="Visible" />
               <Toggle value={form.is_featured} onChange={() => set('is_featured', !form.is_featured)} label="Featured" />
               <Toggle value={form.is_new} onChange={() => set('is_new', !form.is_new)} label="New" />
               <Toggle value={form.is_trending} onChange={() => set('is_trending', !form.is_trending)} label="Trending" />
             </div>
           </F>
+
+          {/* Bottom padding so last field clears the sticky footer */}
+          <div className="h-2" />
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 border-t border-border/50 bg-muted/10 px-4 sm:px-6 py-4 pb-safe">
-          <button onClick={onClose} className="rounded-lg px-4 py-2 text-[12px] text-muted-foreground hover:text-white transition-colors">
+        {/* Sticky footer */}
+        <div className="flex items-center justify-end gap-3 border-t border-border/50 bg-background px-4 sm:px-6 py-3 shrink-0"
+             style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+          <button onClick={onClose}
+            className="rounded-lg px-4 py-2.5 text-[12px] text-muted-foreground hover:text-white transition-colors">
             Cancel
           </button>
-          <button onClick={save} disabled={saving || !form.title || !form.price}
-            className="flex items-center gap-2 rounded-lg bg-white px-5 py-2 text-[12px] font-semibold text-black hover:bg-white/90 disabled:opacity-50 transition-colors">
+          <button
+            onClick={save}
+            disabled={saving || !form.title || !form.price}
+            className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-[12px] font-semibold text-black hover:bg-white/90 disabled:opacity-50 transition-colors"
+          >
             {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
             {product ? 'Save Changes' : 'Create Product'}
           </button>
