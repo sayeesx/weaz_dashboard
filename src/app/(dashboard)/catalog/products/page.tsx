@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
 import {
   Plus, Search, Package, Pencil, Trash2, Copy, Archive, RotateCcw,
   Eye, EyeOff, ChevronDown, Loader2, X, Upload, Check, ImageIcon,
@@ -10,10 +10,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabase = createClient();
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -243,11 +240,11 @@ export function ProductDrawer({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center sm:p-6">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative flex max-h-full w-full max-w-[900px] flex-col rounded-xl border border-border/50 bg-background shadow-2xl overflow-hidden">
+      <div className="relative flex h-full w-full sm:h-auto sm:max-h-full sm:max-w-[900px] flex-col sm:rounded-xl border-0 sm:border border-border/50 bg-background shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-border/50 px-4 sm:px-6 py-3 sm:py-4 bg-muted/30">
           <h2 className="text-[14px] font-bold text-white">
             {product ? 'Edit Product' : 'Create Product'}
           </h2>
@@ -257,7 +254,7 @@ export function ProductDrawer({
         </div>
 
         {/* Form */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-5 space-y-6">
           {/* Images */}
           <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-4">
             <F label="Main Image">
@@ -380,7 +377,7 @@ export function ProductDrawer({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 border-t border-border/50 px-6 py-4">
+        <div className="flex items-center justify-end gap-3 border-t border-border/50 bg-muted/10 px-4 sm:px-6 py-4 pb-safe">
           <button onClick={onClose} className="rounded-lg px-4 py-2 text-[12px] text-muted-foreground hover:text-white transition-colors">
             Cancel
           </button>

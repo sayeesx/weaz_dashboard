@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@supabase/supabase-js';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 export interface LiveOrder {
@@ -37,7 +37,10 @@ interface UseOrdersOptions {
  * Never subscribes to the full table — always constrains by time window.
  */
 export function useOrders({ statusFilter, windowMinutes = 120, limit = 500 }: UseOrdersOptions = {}) {
-  const supabase = createClient();
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
   const [orders, setOrders] = useState<LiveOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -135,7 +138,10 @@ export function useOrders({ statusFilter, windowMinutes = 120, limit = 500 }: Us
  * Not subscribed — called when an order is selected.
  */
 export async function fetchOrderHistory(orderId: string): Promise<OrderHistoryEntry[]> {
-  const supabase = createClient();
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
   const { data, error } = await supabase
     .from('order_status_history')
     .select('*')
@@ -150,7 +156,10 @@ export async function fetchOrderHistory(orderId: string): Promise<OrderHistoryEn
  * Fetch full order detail: items + assignment
  */
 export async function fetchOrderDetail(orderId: string) {
-  const supabase = createClient();
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
   const [itemsRes, assignmentRes] = await Promise.all([
     supabase
       .from('order_items')

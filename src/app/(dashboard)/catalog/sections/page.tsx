@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
 import {
   Plus, Pencil, Trash2, Eye, EyeOff, Copy, X, Loader2, Check,
   GripVertical, ChevronUp, ChevronDown, Calendar, LayoutGrid,
@@ -10,7 +10,7 @@ import {
 import { cn } from '@/lib/utils';
 import { ProductDrawer, Product, Category, Brand } from '../products/page';
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+const supabase = createClient();
 
 function SectionProductsManager({ section, onClose }: { section: Section; onClose: () => void }) {
   const qc = useQueryClient();
@@ -178,14 +178,14 @@ function SectionModal({ section, onClose, onSaved }: { section: Section | null; 
   const sel = 'h-9 w-full rounded-lg border border-border/50 bg-muted/30 px-3 text-[12px] text-white outline-none';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 flex max-h-full w-full max-w-[600px] flex-col rounded-xl border border-border/50 bg-background shadow-2xl overflow-hidden">
+      <div className="relative z-10 flex h-full w-full sm:h-auto sm:max-h-[90vh] sm:max-w-[600px] flex-col sm:rounded-xl border-0 sm:border border-border/50 bg-background shadow-2xl overflow-hidden">
         <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
           <h3 className="text-[14px] font-bold text-white">{section ? 'Edit Section' : 'New Section'}</h3>
           <button onClick={onClose} className="rounded p-1.5 text-muted-foreground hover:text-white"><X className="h-4 w-4" /></button>
         </div>
-        <div className="flex-1 overflow-y-auto space-y-4 px-6 py-5">
+        <div className="flex-1 overflow-y-auto space-y-5 px-4 sm:px-6 py-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <F label="Section Type">
               <select value={form.type} onChange={e => set('type', e.target.value)} className={sel}>

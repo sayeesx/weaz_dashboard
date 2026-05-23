@@ -6,6 +6,7 @@ const PROTECTED_ROUTES = [
   '/inventory', '/analytics', '/finance', '/marketing', '/support',
   '/settings', '/system', '/ops', '/flags', '/ai',
   '/live', '/dispatch', '/incidents',
+  '/catalog', '/audit', '/experiments',
 ];
 
 const ADMIN_ROLES = ['platform_admin', 'store_admin', 'support', 'analyst'];
@@ -18,6 +19,7 @@ const ROUTE_ROLE_MAP: Record<string, string[]> = {
   '/dashboard':   ['platform_admin', 'store_admin', 'support', 'analyst'],
   '/orders':      ['platform_admin', 'store_admin', 'support'],
   '/products':    ['platform_admin', 'store_admin'],
+  '/catalog':     ['platform_admin', 'store_admin'],
   '/customers':   ['platform_admin', 'store_admin', 'support'],
   '/delivery':    ['platform_admin', 'store_admin'],
   '/inventory':   ['platform_admin', 'store_admin'],
@@ -30,6 +32,8 @@ const ROUTE_ROLE_MAP: Record<string, string[]> = {
   '/ops':         ['platform_admin'],
   '/flags':       ['platform_admin'],
   '/ai':          ['platform_admin', 'analyst'],
+  '/audit':       ['platform_admin'],
+  '/experiments': ['platform_admin', 'analyst'],
 };
 
 export async function middleware(request: NextRequest) {

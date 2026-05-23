@@ -2,11 +2,11 @@
 
 import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
 import { Plus, Search, Pencil, Trash2, X, Loader2, Check, Upload, ImageIcon, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+const supabase = createClient();
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
 interface Category    { id: string; slug: string; title: string; cloudinary_image_url: string | null; }
@@ -70,9 +70,9 @@ function CatModal({ category, onClose, onSaved }: { category: Category | null; o
     setSaving(false); onSaved(); onClose();
   };
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-[380px] rounded-2xl border border-border/50 bg-card p-6 shadow-2xl">
+      <div className="relative z-10 flex h-full w-full sm:h-auto sm:max-h-[90vh] sm:max-w-[380px] flex-col sm:rounded-2xl border-0 sm:border border-border/50 bg-card p-6 shadow-2xl">
         <div className="mb-5 flex items-center justify-between">
           <h3 className="text-[14px] font-bold text-white">{category ? 'Edit Category' : 'New Category'}</h3>
           <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:text-white"><X className="h-4 w-4" /></button>
@@ -108,9 +108,9 @@ function SubModal({ sub, categoryId, onClose, onSaved }: { sub: Subcategory | nu
     setSaving(false); onSaved(); onClose();
   };
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-[340px] rounded-2xl border border-border/50 bg-card p-5 shadow-2xl">
+      <div className="relative z-10 flex h-full w-full sm:h-auto sm:max-h-[90vh] sm:max-w-[340px] flex-col sm:rounded-2xl border-0 sm:border border-border/50 bg-card p-5 shadow-2xl">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-[13px] font-bold text-white">{sub ? 'Edit Subcategory' : 'New Subcategory'}</h3>
           <button onClick={onClose} className="rounded p-1 text-muted-foreground hover:text-white"><X className="h-3.5 w-3.5" /></button>
