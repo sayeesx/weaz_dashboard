@@ -112,7 +112,7 @@ export function OpsTerminal() {
     <div className="flex h-[calc(100vh-4rem)] w-full flex-col overflow-hidden bg-black text-[#878787] font-mono text-[12px]">
 
       {/* KPI Bar */}
-      <div className="grid grid-cols-5 divide-x divide-[#1a1a1a] border-b border-[#1a1a1a]">
+      <div className="grid grid-cols-2 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-[#1a1a1a] border-b border-[#1a1a1a]">
         <div className="p-3">
           <div className="text-[10px] uppercase text-white/30">Active Queue</div>
           <div className="mt-1 text-xl font-medium text-white">{filteredOrders.length} <span className="text-[10px] text-white/30">orders</span></div>
@@ -139,7 +139,7 @@ export function OpsTerminal() {
             ))}
           </div>
         </div>
-        <div className="flex items-center justify-between p-3">
+        <div className="flex items-center justify-between p-3 col-span-2 md:col-span-1 border-t md:border-t-0 border-[#1a1a1a]">
           <div>
             <div className="text-[10px] uppercase text-white/30">Stream</div>
             <div className="mt-1 text-[11px] font-medium text-emerald-500">{loading ? 'SYNCING…' : error ? 'ERROR' : 'LIVE'}</div>
@@ -169,10 +169,10 @@ export function OpsTerminal() {
         })}
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
 
         {/* Left: Live Queue */}
-        <div className="flex w-[44%] flex-col border-r border-[#1a1a1a]">
+        <div className="flex flex-1 md:flex-none w-full md:w-[44%] lg:w-[40%] flex-col border-b md:border-b-0 md:border-r border-[#1a1a1a] min-h-[40vh] md:min-h-0">
           {/* Search */}
           <div className="flex items-center gap-2 border-b border-[#1a1a1a] bg-[#0a0a0a] px-4 py-2.5">
             <Search className="h-3.5 w-3.5 text-white/30 flex-shrink-0" />
@@ -290,7 +290,7 @@ export function OpsTerminal() {
                 ) : (
                   <>
                     {/* Meta always visible */}
-                    <div className="mb-5 grid grid-cols-2 gap-3">
+                    <div className="mb-5 grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="rounded border border-[#1a1a1a] bg-black p-3">
                         <div className="mb-2 flex items-center gap-1.5 text-[10px] uppercase text-white/30"><Clock className="h-3 w-3" /> Timestamps</div>
                         <div className="space-y-1.5">

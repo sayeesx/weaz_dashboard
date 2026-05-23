@@ -63,7 +63,7 @@ export default function InventoryPage() {
     <div className="h-[calc(100vh-4rem)] flex flex-col bg-black font-mono text-[12px] text-[#888]">
 
       {/* KPIs */}
-      <div className="grid grid-cols-4 divide-x divide-[#1a1a1a] border-b border-[#1a1a1a]">
+      <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[#1a1a1a] border-b border-[#1a1a1a]">
         {[
           { label: 'In Stock',     value: counts.ok,       color: 'text-green-400',  icon: Package },
           { label: 'Low Stock',    value: counts.low,      color: 'text-amber-400',  icon: TrendingDown },

@@ -1,32 +1,43 @@
 'use client';
 
-import { Search, Bell, Command, Sparkles, User } from 'lucide-react';
+import { Search, Bell, Command, Sparkles, User, Menu } from 'lucide-react';
 import { useUIStore, useAuthStore } from '@/store';
 import { cn, getInitials } from '@/lib/utils';
 
 export function Header() {
-  const { setCommandPaletteOpen, setNotificationPanelOpen, setAIPanelOpen, sidebarCollapsed } = useUIStore();
+  const { setCommandPaletteOpen, setNotificationPanelOpen, setAIPanelOpen, sidebarCollapsed, toggleSidebar } = useUIStore();
   const user = useAuthStore((s) => s.user);
   const role = useAuthStore((s) => s.role);
 
   return (
     <header
       className={cn(
-        'sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/50 bg-background/80 px-6 backdrop-blur-xl transition-all duration-300',
-        sidebarCollapsed ? 'ml-[68px]' : 'ml-[240px]'
+        'sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/50 bg-background/80 px-4 lg:px-6 backdrop-blur-xl transition-all duration-300',
+        sidebarCollapsed ? 'lg:ml-[68px]' : 'lg:ml-[240px]',
+        'ml-0'
       )}
     >
-      {/* Search trigger */}
-      <button
-        onClick={() => setCommandPaletteOpen(true)}
-        className="flex items-center gap-2.5 rounded-lg border border-border/50 bg-muted/40 px-3 py-1.5 text-[13px] text-muted-foreground transition-colors hover:border-border hover:bg-muted/60"
-      >
-        <Search className="h-3.5 w-3.5" />
-        <span>Search anything...</span>
-        <kbd className="ml-8 flex items-center gap-0.5 rounded border border-border/60 bg-background/60 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-          <Command className="h-2.5 w-2.5" />K
-        </kbd>
-      </button>
+      <div className="flex items-center gap-2 lg:gap-4">
+        {/* Hamburger Menu Mobile */}
+        <button
+          onClick={toggleSidebar}
+          className="lg:hidden flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-white"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+
+        {/* Search trigger */}
+        <button
+          onClick={() => setCommandPaletteOpen(true)}
+          className="flex items-center gap-2.5 rounded-lg border border-border/50 bg-muted/40 px-3 py-1.5 text-[13px] text-muted-foreground transition-colors hover:border-border hover:bg-muted/60"
+        >
+          <Search className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">Search anything...</span>
+          <kbd className="ml-2 sm:ml-8 hidden sm:flex items-center gap-0.5 rounded border border-border/60 bg-background/60 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+            <Command className="h-2.5 w-2.5" />K
+          </kbd>
+        </button>
+      </div>
 
       {/* Right actions */}
       <div className="flex items-center gap-1">

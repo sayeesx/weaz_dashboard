@@ -39,7 +39,7 @@ export default function GovernanceHubPage() {
          </div>
       </div>
 
-      <div className="p-8 grid grid-cols-2 gap-8">
+      <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
          
          <div className="space-y-8">
             {/* Feature Flags Quick View */}

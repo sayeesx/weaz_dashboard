@@ -61,7 +61,7 @@ export default function IncidentsPage() {
     <div className="h-[calc(100vh-4rem)] flex flex-col bg-black font-mono text-[12px] text-[#888]">
 
       {/* Top Bar */}
-      <div className="grid grid-cols-4 divide-x divide-[#1a1a1a] border-b border-[#1a1a1a]">
+      <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[#1a1a1a] border-b border-[#1a1a1a]">
         {[
           { label: 'Unresolved', value: stats.open, color: 'text-red-400' },
           { label: 'Critical', value: stats.critical, color: 'text-red-500 font-bold' },

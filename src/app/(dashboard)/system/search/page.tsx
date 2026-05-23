@@ -80,7 +80,7 @@ export default function SearchGovernancePage() {
          </div>
       </div>
 
-      <div className="flex-1 grid grid-cols-2 divide-x divide-[#1a1a1a] overflow-hidden">
+      <div className="flex-1 flex flex-col md:grid md:grid-cols-2 lg:grid-cols-[55%_45%] xl:grid-cols-2 md:divide-x divide-y md:divide-y-0 divide-[#1a1a1a] overflow-x-hidden md:overflow-hidden min-h-0">
         
         {/* Left: Test Console */}
         <div className="flex flex-col">

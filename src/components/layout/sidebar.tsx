@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, ShoppingCart, Package, Users, Truck, Warehouse,
   BarChart3, DollarSign, Megaphone, HeadphonesIcon, Settings, Server,
-  Activity, Flag, Bot, ChevronLeft, ChevronRight, Zap, Radio, Navigation, AlertOctagon, Search, ShieldCheck, Receipt, TestTube, LibraryBig
+  Activity, Flag, ChevronLeft, ChevronRight, Zap, Radio, Navigation, AlertOctagon, Search, ShieldCheck, Receipt, TestTube, LibraryBig,
+  Tag, Image as ImageIcon, LayoutGrid, FolderOpen
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store';
@@ -19,6 +20,12 @@ const NAV_ITEMS = [
   { label: 'Orders',     href: '/orders',     icon: ShoppingCart,    group: 'core' },
   { label: 'Products',   href: '/products',   icon: Package,         group: 'core' },
   { label: 'Customers',  href: '/customers',  icon: Users,           group: 'core' },
+  // ── Catalog CMS ──
+  { label: 'Products',   href: '/catalog/products',   icon: Package,     group: 'catalog' },
+  { label: 'Categories', href: '/catalog/categories', icon: Tag,         group: 'catalog' },
+  { label: 'Banners',    href: '/catalog/banners',    icon: ImageIcon,   group: 'catalog' },
+  { label: 'Sections',   href: '/catalog/sections',   icon: LayoutGrid,  group: 'catalog' },
+  { label: 'Media',      href: '/catalog/media',      icon: FolderOpen,  group: 'catalog' },
   { label: 'Live Map',   href: '/live',       icon: Radio,           group: 'operations' },
   { label: 'Dispatch',   href: '/dispatch',   icon: Navigation,      group: 'operations' },
   { label: 'Delivery',   href: '/delivery',   icon: Truck,           group: 'operations' },
@@ -49,7 +56,7 @@ const GROUP_LABELS: Record<string, string> = {
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { sidebarCollapsed, collapseSidebar, expandSidebar } = useUIStore();
+  const { sidebarCollapsed, collapseSidebar, expandSidebar, sidebarOpen, toggleSidebar } = useUIStore();
   const role = useAuthStore((s) => s.role) || 'platform_admin';
 
   const filteredItems = NAV_ITEMS.filter((item) => {
@@ -64,13 +71,23 @@ export function Sidebar() {
   }, {});
 
   return (
-    <aside
-      className={cn(
-        'fixed left-0 top-0 z-40 h-screen flex flex-col border-r border-border/50 bg-sidebar transition-all duration-300 ease-out',
-        sidebarCollapsed ? 'w-[68px]' : 'w-[240px]'
+    <>
+      {/* Mobile Backdrop */}
+      {sidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+          onClick={toggleSidebar}
+        />
       )}
-    >
-      {/* Logo */}
+      <aside
+        className={cn(
+          'fixed left-0 top-0 z-50 h-screen flex flex-col border-r border-border/50 bg-sidebar transition-all duration-300 ease-out',
+          'lg:translate-x-0',
+          sidebarCollapsed ? 'lg:w-[68px]' : 'lg:w-[240px]',
+          sidebarOpen ? 'translate-x-0 w-[240px]' : '-translate-x-full w-[240px]'
+        )}
+      >
+        {/* Logo */}
       <div className="flex h-14 items-center gap-2.5 border-b border-border/50 px-4">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10">
           <Zap className="h-4 w-4 text-white" />
@@ -106,6 +123,9 @@ export function Sidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => {
+                    if (window.innerWidth < 1024) toggleSidebar();
+                  }}
                   className={cn(
                     'group relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition-all duration-150',
                     isActive
@@ -140,6 +160,7 @@ export function Sidebar() {
           {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }

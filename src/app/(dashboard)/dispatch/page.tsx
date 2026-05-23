@@ -43,7 +43,7 @@ export default function DispatchPage() {
     <div className="h-[calc(100vh-4rem)] flex flex-col bg-black font-mono text-[12px] text-[#888]">
 
       {/* Top Status Bar */}
-      <div className="grid grid-cols-5 divide-x divide-[#1a1a1a] border-b border-[#1a1a1a]">
+      <div className="grid grid-cols-2 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-[#1a1a1a] border-b border-[#1a1a1a]">
         {stats.map(stat => (
           <div key={stat.label} className="p-3">
             <div className="text-[10px] uppercase text-white/30">{stat.label}</div>

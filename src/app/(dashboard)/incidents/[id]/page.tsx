@@ -106,7 +106,7 @@ export default function IncidentDetailPage() {
         {/* Main Feed */}
         <div className="p-8 space-y-8 overflow-y-auto">
           
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
              <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 space-y-4">
                 <div className="flex items-center gap-2 text-white/30 tracking-widest text-[10px] font-bold uppercase">
                   <Activity className="h-3 w-3" /> Context Metrics

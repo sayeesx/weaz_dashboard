@@ -81,7 +81,7 @@ export default function ChaosTestPage() {
         </div>
       </div>
 
-      <div className="flex-1 grid grid-cols-2 gap-0 divide-x divide-[#1a1a1a]">
+      <div className="flex-1 flex flex-col lg:grid lg:grid-cols-2 gap-0 lg:divide-x divide-y lg:divide-y-0 divide-[#1a1a1a]">
         
         {/* Realtime Telemetry */}
         <div className="p-8 flex flex-col gap-6">

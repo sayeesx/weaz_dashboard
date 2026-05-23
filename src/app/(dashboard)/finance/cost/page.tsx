@@ -72,57 +72,59 @@ export default function CostGovernancePage() {
          </div>
       </div>
 
-      <div className="grid grid-cols-4 divide-x divide-[#1a1a1a] border-b border-[#1a1a1a] bg-[#030303]">
+      <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[#1a1a1a] border-b border-[#1a1a1a] bg-[#030303]">
         {[
           { label: 'Avg Cost / Order', value: `$${metrics.costPerOrder.toFixed(5)}`, icon: Package, color: 'text-emerald-500' },
           { label: 'Avg Cost / Search', value: `$${metrics.costPerSearch.toFixed(5)}`, icon: Search, color: 'text-blue-500' },
           { label: 'Avg Cost / Dispatch', value: `$${metrics.costPerDriverCalc.toFixed(5)}`, icon: Navigation, color: 'text-amber-500' },
           { label: 'Cloud Egress Forecast', value: `$${metrics.dailyForecast.toFixed(2)}`, icon: Activity, color: 'text-purple-500' },
         ].map(stat => (
-          <div key={stat.label} className="p-6">
+          <div key={stat.label} className="p-4 md:p-6 border-[#1a1a1a] md:border-t-0 [&:nth-child(even)]:border-l">
             <div className="flex items-center gap-2 text-[10px] uppercase text-white/30 mb-2 font-bold tracking-widest">
                <stat.icon className="h-3 w-3" /> {stat.label}
             </div>
-            <div className={`text-2xl font-bold tracking-tight tabular-nums ${stat.color}`}>{loading ? '...' : stat.value}</div>
+            <div className={`text-xl md:text-2xl font-bold tracking-tight tabular-nums ${stat.color}`}>{loading ? '...' : stat.value}</div>
           </div>
         ))}
       </div>
 
-      <div className="flex-1 grid grid-cols-[1fr_350px] divide-x divide-[#1a1a1a]">
-         <div className="p-8">
-            <h3 className="text-white uppercase font-bold tracking-widest text-[10px] mb-6 flex items-center gap-2">
+      <div className="flex-1 flex flex-col xl:grid xl:grid-cols-[1fr_350px] xl:divide-x divide-[#1a1a1a] min-h-0">
+         <div className="p-4 md:p-8 min-w-0 flex flex-col">
+            <h3 className="text-white uppercase font-bold tracking-widest text-[10px] mb-6 flex items-center gap-2 shrink-0">
                <Zap className="h-3 w-3 text-amber-500" /> Live Event Trace Stream (100)
             </h3>
             
-            <div className="space-y-2">
-                <div className="grid grid-cols-[120px_1fr_100px_80px_120px] px-4 py-2 text-[9px] uppercase font-bold text-white/20 border-b border-[#1a1a1a]">
+            <div className="space-y-2 overflow-x-auto min-h-0 flex-1">
+                <div className="min-w-[600px] grid grid-cols-[120px_1fr_100px_80px_120px] px-4 py-2 text-[9px] uppercase font-bold text-white/20 border-b border-[#1a1a1a]">
                    <span>Provider</span>
                    <span>Event Type</span>
                    <span className="text-right">Duration</span>
                    <span className="text-right">Cost (USD)</span>
                    <span className="text-right">Dimensions</span>
                 </div>
-               {loading ? (
-                 <div className="p-4 text-center text-white/20">Loading cost telemetry...</div>
-               ) : costs.map(cost => (
-                 <div key={cost.id} className="grid grid-cols-[120px_1fr_100px_80px_120px] px-4 py-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded hover:border-white/10 transition-colors items-center">
-                    <span className="text-white/40 uppercase text-[9px]">{cost.provider.replace('supabase_', '')}</span>
-                    <span className="text-white font-medium capitalize truncate">{cost.event_type.replace('_', ' ')}</span>
-                    <span className="text-amber-500 text-right tabular-nums">{cost.duration_ms}ms</span>
-                    <span className="text-emerald-500 text-right font-bold tabular-nums">${Number(cost.estimated_cost).toFixed(5)}</span>
-                    <span className="text-right flex justify-end">
-                       {cost.dimensions?.feature_flag ? (
-                         <span className="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-1.5 py-0.5 rounded text-[9px] uppercase">
-                            FLAG: {cost.dimensions.feature_flag}
-                         </span>
-                       ) : <span className="text-white/10">-</span>}
-                    </span>
-                 </div>
-               ))}
+               <div className="min-w-[600px] space-y-2 pb-4">
+                 {loading ? (
+                   <div className="p-4 text-center text-white/20">Loading cost telemetry...</div>
+                 ) : costs.map(cost => (
+                   <div key={cost.id} className="grid grid-cols-[120px_1fr_100px_80px_120px] px-4 py-3 bg-[#0a0a0a] border border-[#1a1a1a] rounded hover:border-white/10 transition-colors items-center">
+                      <span className="text-white/40 uppercase text-[9px]">{cost.provider.replace('supabase_', '')}</span>
+                      <span className="text-white font-medium capitalize truncate">{cost.event_type.replace('_', ' ')}</span>
+                      <span className="text-amber-500 text-right tabular-nums">{cost.duration_ms}ms</span>
+                      <span className="text-emerald-500 text-right font-bold tabular-nums">${Number(cost.estimated_cost).toFixed(5)}</span>
+                      <span className="text-right flex justify-end">
+                         {cost.dimensions?.feature_flag ? (
+                           <span className="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-1.5 py-0.5 rounded text-[9px] uppercase">
+                              FLAG: {cost.dimensions.feature_flag}
+                           </span>
+                         ) : <span className="text-white/10">-</span>}
+                      </span>
+                   </div>
+                 ))}
+               </div>
             </div>
          </div>
 
-         <div className="bg-[#050505] p-6 space-y-6">
+         <div className="bg-[#050505] p-4 md:p-6 space-y-6 shrink-0 border-t xl:border-t-0 border-[#1a1a1a]">
             <div className="bg-amber-500/5 border border-amber-500/10 rounded-lg p-5">
                <div className="flex items-center gap-2 text-amber-500 font-bold uppercase text-[10px] mb-2">
                   <AlertTriangle className="h-3.5 w-3.5" /> High-Cost Feature Warning

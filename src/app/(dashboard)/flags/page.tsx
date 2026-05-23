@@ -53,7 +53,7 @@ export default function FlagsPage() {
          ) : flags.length === 0 ? (
            <div className="text-white/20">No feature flags registered in the system.</div>
          ) : (
-           <div className="grid grid-cols-2 gap-6">
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               {flags.map((flag) => {
                  const rollouts = flag.flag_rollouts || [];
                  const activeRollout = rollouts[0]; // Simplification for UI

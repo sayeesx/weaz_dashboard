@@ -63,7 +63,7 @@ export default function AnalyticsPage() {
       )}
 
       {/* Header Stat Cards */}
-      <div className="grid grid-cols-4 divide-x divide-[#1a1a1a] border-b border-[#1a1a1a] bg-[#050505]">
+      <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[#1a1a1a] border-b border-[#1a1a1a] bg-[#050505]">
         {[
           { label: 'Total Revenue', value: `₹${totalGMV.toLocaleString()}`, trend: '+12.5%', up: true, icon: TrendingUp },
           { label: 'Order Volume', value: totalOrders, trend: '+8.2%', up: true, icon: ShoppingBag },
@@ -92,7 +92,7 @@ export default function AnalyticsPage() {
       <div className="p-6 space-y-6">
         
         {/* Main Charts Row */}
-        <div className="grid grid-cols-2 gap-6 h-[300px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-auto md:h-[300px]">
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <span className="text-[11px] font-bold text-white uppercase tracking-wider">Revenue Growth</span>
@@ -152,7 +152,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Bottom Row */}
-        <div className="grid grid-cols-3 gap-6 h-[260px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-auto md:h-[260px]">
           
           <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5 flex flex-col">
             <span className="text-[10px] font-bold text-white/30 uppercase mb-4 tracking-widest">Delivery SLA Trend (p95)</span>

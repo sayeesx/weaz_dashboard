@@ -80,7 +80,7 @@ export default function SystemHealthPage() {
         </button>
       </div>
 
-      <div className="flex-1 grid grid-cols-3 gap-0 divide-x divide-[#1a1a1a] overflow-hidden">
+      <div className="flex-1 flex flex-col lg:grid lg:grid-cols-3 gap-0 lg:divide-x divide-y lg:divide-y-0 divide-[#1a1a1a] min-h-0 overflow-x-hidden lg:overflow-hidden">
         
         {/* Core Infrastructure */}
         <div className="p-8 space-y-6 overflow-y-auto">
